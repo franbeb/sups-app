@@ -6,7 +6,7 @@
 
 <ion-content>
 <ion-list>
-  <ion-item *ngFor= "let s of supers" [routerLink]="['/profile/' +s.id]">
+  <ion-item *ngFor= "let s of favoritos" [routerLink]="['/profile/' +s.id]">
     <ion-label>{{s.name}}</ion-label>
 	<ion-label>{{s.id}}</ion-label>
 	<ion-button color="danger" (click)="borrar(id)">Borrar</ion-button>

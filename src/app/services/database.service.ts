@@ -1,122 +1,131 @@
-import { Platform } from '@ionic/angular';
 import { Injectable } from '@angular/core';
-import { SQLitePorter } from '@ionic-native/sqlite-porter/ngx';
-import { HttpClient } from '@angular/common/http';
 import { SQLite, SQLiteObject } from '@ionic-native/sqlite/ngx';
-import { BehaviorSubject, Observable } from 'rxjs';
- 
+// import { Superheroe } from '../models/superheroe';
+
 export interface Sup {
   id: number,
-  name: string,
+  name: string,}
 
-}
- 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class DatabaseService {
-  private database: SQLiteObject= null;
-  private dbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
-  private ready: boolean= false;
- 
-  supers = new BehaviorSubject([]);
-  
- 
-  constructor(private plt: Platform, private sqlitePorter: SQLitePorter, private sqlite: SQLite, private http: HttpClient) {
-    this.plt.ready().then(() => {
-		while(true){console.log("platform ready")}
-      this.sqlite.create({
-        name: 'supers.db',
-        location: 'default'
-      })
-      .then((db: SQLiteObject) => {
-          this.database = db;
-          this.seedDatabase();
-      });
-    });
-  }
- createDB(){
-		console.log("me siento ready:")
-		console.log(this.ready)
-		this.sqlite.create({
-        name: 'supers.db',
-        location: 'default'
-      })
-	  .then((db: SQLiteObject) => {
-          this.database = db;
-		  console.log("la voy a seedear");
-          this.seedDatabase();
-		  console.log("la seedie")
-		});
- }
- 
-  seedDatabase() {
-    this.http.get('assets/seed.sql', { responseType: 'text'})
-    .subscribe(sql => {
-      this.sqlitePorter.importSqlToDb(this.database, sql)
-        .then(_ => {
-          this.loadSupers();
-          this.dbReady.next(true);
-		  this.ready= true
-        })
-        .catch(e => console.error(e));
-    });
-  }
- 
-  getDatabaseState() {
-    return this.dbReady.asObservable();
-  }  
-  isReady() {
-    return this.ready;
-  }
- 
-  getSups(): Observable<Sup[]> {
-    return this.supers.asObservable();
-  }
- 
 
-loadSupers() {
-    return this.database.executeSql('SELECT * FROM supers', []).then(data => {
-      let supers: Sup[] = [];
- 
-      if (data.rows.length > 0) {
-        for (var i = 0; i < data.rows.length; i++) {
- 
-          supers.push({ 
-            id: data.rows.item(i).id,
-            name: data.rows.item(i).name, 
-           });
-        }
-      }
-      this.supers.next(supers);
-    });
-  }
- 
-  addSuper(id, name) {
-    let data = [id, name];
-    return this.database.executeSql('INSERT INTO developer (id,name) VALUES (?, ?)', data).then(data => {
-      this.loadSupers();
-    });
-  }
- 
-  getSuper(id): Promise<Sup> {
-    return this.database.executeSql('SELECT * FROM super WHERE id = ?', [id]).then(data => {
-      return {
-        id: data.rows.item(0).id,
-        name: data.rows.item(0).name, 
-      }
-    });
-  }
- 
-  deleteSuper(id) {
-    return this.database.executeSql('DELETE FROM developer WHERE id = ?', [id]).then(_ => {
-      this.loadSupers();
-    });
-  }
- 
-  // updateDeveloper(dev: Dev) {
-    // let data = [dev.name, JSON.stringify(dev.skills), dev.img];
-    // return this.database.executeSql(`UPDATE developer SET name = ?, skills = ?, img = ? WHERE id = ${dev.id}`, data).then(data => {
-      // this.loadDevelopers();
-    // })
-  }
+
+export class DatabaseService {
+    db: SQLiteObject
+    tables = {
+        heroes: "superheroes_favoritos"
+    }
+
+    constructor(private sqlite: SQLite) {}
+
+    async createDatabase(){
+        await this.sqlite.create({
+            name:"superheroes",
+            location:"default"
+        })
+        .then((db: SQLiteObject)=>{
+            this.db=db;
+        })
+        .catch((e)=>{
+            alert("Error creando la BD " + JSON.stringify(e));
+        });
+
+        await this.createTables();
+    }
+
+    async createTables(){
+        let consulta="CREATE TABLE IF NOT EXISTS superheroes_favoritos ( id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, id_heroe VARCHAR(255) NULL UNIQUE, name VARCHAR(255) NULL, p_intelligence VARCHAR(255) NULL, p_strength VARCHAR(255) NULL,p_speed VARCHAR(255) NULL,"
+        consulta= consulta + "p_durability VARCHAR(255) NULL, p_power VARCHAR(255) NULL, p_combat VARCHAR(255) NULL, b_full_name VARCHAR(255) NULL, b_place_of_birth VARCHAR(255) NULL, b_publisher VARCHAR(255) NULL, a_gender VARCHAR(255) NULL,"
+        consulta= consulta + "a_race VARCHAR(255) NULL, a_height VARCHAR(255) NULL, a_weight VARCHAR(255) NULL, a_eye_color VARCHAR(255) NULL, a_hair_color VARCHAR(255) NULL, w_occupation VARCHAR(255) NULL, image_url LONGTEXT NULL)"
+        await this.db.executeSql(consulta,[])
+    }
+
+
+    async insertarHeroe(heroe){
+        return this.db.executeSql(
+            `INSERT INTO ${this.tables.heroes} (id_heroe, name, p_intelligence, p_strength, p_speed, p_durability, p_power, p_combat, b_full_name, b_place_of_birth, b_publisher, a_gender, a_race, a_height, a_weight, a_eye_color, a_hair_color, w_occupation, image_url) ` +
+            `VALUES (${heroe.id}, '${heroe.name}','${heroe.powerstats["intelligence"]}','${heroe.powerstats["strength"]}','${heroe.powerstats["speed"]}','${heroe.powerstats["durability"]}',` + 
+            `'${heroe.powerstats["power"]}','${heroe.powerstats["combat"]}','${heroe.biography["full-name"]}','${heroe.biography["place-of-birth"]}','${heroe.biography["publisher"]}',` + 
+            `'${heroe.appearance["gender"]}','${heroe.appearance["race"]}','${heroe.appearance["height"][1]}','${heroe.appearance["weight"][1]}','${heroe.appearance["eye-color"]}',` + 
+            `'${heroe.appearance["hair-color"]}','${heroe.work["occupation"]}','${heroe.image["url"]}')`,
+            []
+        ).then(()=>{
+            return "Elemento Agregado"
+        })
+        .catch((e)=>{
+            return JSON.stringify(e)
+        })
+    }
+	
+	
+async newSup(nom, id){
+        return this.db.executeSql(
+            `INSERT INTO ${this.tables.heroes} (id_heroe, name) ` +
+            `VALUES (${id}, '${nom}')`,
+            []
+        ).then(()=>{
+            return "Elemento Agregado"
+        })
+        .catch((e)=>{
+            return JSON.stringify(e)
+        })
+    }
+    async eliminarHeroe(id_heroe){
+        return this.db
+            .executeSql(`DELETE FROM ${this.tables.heroes} WHERE id_heroe = ${id_heroe}`, [])
+            .then(() => {
+                return "Heroe eliminado";
+            })
+            .catch((e) => {
+                return "Error eliminado superheroe: " + JSON.stringify(e);
+        });
+    }
+
+    async buscarSiEsFavorito(id_heroe){
+        return this.db.executeSql(
+            `SELECT * from superheroes_favoritos where id_heroe = ${id_heroe}`,
+            []
+        ).then((res)=>{
+            return res;
+        })
+        .catch((e)=>{
+            return JSON.stringify(e)
+        })
+    }
+
+    async buscarSiEsFavoritoPorIDLocal(id){
+        return this.db.executeSql(
+            `SELECT id from superheroes_favoritos where id = ${id}`,
+            []
+        ).then((res)=>{
+            return res;
+        })
+        .catch((e)=>{
+            return JSON.stringify(e)
+        })
+    }
+
+    async getHeroes(){
+        return this.db.executeSql(
+            "SELECT * from superheroes_favoritos",
+            []
+        ).then((res)=>{
+            return res;
+        })
+        .catch((e)=>{
+            return JSON.stringify(e)
+        })
+    }
+
+    async deleteDatabase(){
+        this.sqlite.deleteDatabase({ name: "superheroes", location: 'default'})
+        .then(()=>{
+            return "BD Borrada"
+        })
+        .catch((e)=>{
+            return "Falló"
+        })
+        
+    }
+}

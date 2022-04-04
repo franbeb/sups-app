@@ -47,11 +47,11 @@ export class ProfilePage implements OnInit {
   }
   ionChange(ev){
 	console.log(ev.detail.checked);
-	if(ev.detail.checked){
-		this.db.addSuper(this.profileId,this.data['name'])
-	}else{
-		this.db.deleteSuper(this.profileId)
-	}
+	// if(ev.detail.checked){
+		// this.db.addSuper(this.profileId,this.data['name'])
+	// }else{
+		// this.db.deleteSuper(this.profileId)
+	// }
   
   
   }
