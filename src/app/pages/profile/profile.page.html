@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Super heroe:</ion-title>
+	<ion-buttons slot="start">
+		<ion-back-button deafultHref= "search"></ion-back-button>
+	</ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+
+
+  <div *ngIf = "data">
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>
+	{{data.name}}
+	</ion-card-title>
+  </ion-card-header>
+	<ion-checkbox (ionChange)="ionChange($event)"></ion-checkbox> <ion-label> Favorito</ion-label>
+
+  <ion-card-content>
+	<ion-card-subtitle>
+	Nombre completo: {{biography['full-name']}} 
+	<br>
+	</ion-card-subtitle>
+	<img src = "{{image.url}}">
+	<br>
+	Lugar de nacimiento: {{biography['place-of-birth']}}
+	<br>
+	Editorial: {{biography['publisher']}}
+	<br><br>
+	Apariencia:<br>
+	Sexo: {{looks.gender}}<br>
+	Especie: {{looks.race}}<br>
+	Color de pelo: {{looks["hair-color"]}}<br>
+	Color de ojos: {{looks['eye-color']}}<br>
+	Peso: {{looks.weight}}<br>
+	Altura: {{looks.height}}<br>
+	<br>
+	<!-- {{data.powerstats}} -->
+	Poderes<br>
+	Inteligencia: {{powers['intelligence']}}<br>
+	Fuerza: {{powers['strength']}}<br>
+	Velocidad: {{powers['speed']}}<br>
+	Durabilidad: {{powers['durability']}}<br>
+	Poder: {{powers['power']}}<br>
+	<br>
+	Trabajo/s: {{work['occupation']}}
+  </ion-card-content>
+</ion-card>
+</div>
+
+</ion-content>
