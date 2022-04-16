@@ -12,24 +12,22 @@ import { ToastController } from '@ionic/angular';
   styleUrls: ['./favoritos.page.scss'],
 })
 export class FavoritosPage implements OnInit {
-	supers: Sup[] = [];
+	// supers: Sup[] = [];
+	supers = [];
 	sup = {}
   constructor(private route: ActivatedRoute, private db: DatabaseService, private router: Router, private toast: ToastController) { }
 
+
+  
   ngOnInit() {
-	console.log(this.db.getDatabaseState());
-	console.log(this.db.isReady());
-	this.db.createDB()
-	// db2=new DatabaseService()
     this.db.getDatabaseState().subscribe(rdy => {
-      if (rdy) {console.log("readyyy")
-				this.db.seedDatabase()
+      if (rdy) {
         this.db.getSups().subscribe(sups => {
-		console.log(sups)
           this.supers = sups;
         })
       }
     });
+
   }
 	
 	borrar(id) {

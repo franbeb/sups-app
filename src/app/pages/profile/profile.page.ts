@@ -8,6 +8,8 @@ import { Observable } from 'rxjs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ToastController } from '@ionic/angular';
 
+// import { SocialSharing } from '@awesome-cordova-plugins/social-sharing/ngx';
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -28,7 +30,9 @@ export class ProfilePage implements OnInit {
 	private activatedRoute: ActivatedRoute,
 	private http: HttpClient,
 	private db: DatabaseService,
-	private router: Router, private toast: ToastController) {}
+	private router: Router, private toast: ToastController,
+	// private socialSharing: SocialSharing
+	) {}
 	
   ngOnInit() {
 	
@@ -55,6 +59,15 @@ export class ProfilePage implements OnInit {
   
   
   }
+  
+  // email(){
+	// this.socialSharing.shareViaEmail('Body', 'Subject', ['recipient@example.org']).then(() => {
+  // // Success!
+// }).catch(() => {
+  // // Error!
+// });
+  
+  // }
   
   // ionChange(event){
 	// console.log(event.detail.checked);

@@ -15,7 +15,7 @@ export interface Sup {
   providedIn: 'root'
 })
 export class DatabaseService {
-  private database: SQLiteObject= null;
+  private database: SQLiteObject;
   private dbReady: BehaviorSubject<boolean> = new BehaviorSubject(false);
   private ready: boolean= false;
  
@@ -24,7 +24,6 @@ export class DatabaseService {
  
   constructor(private plt: Platform, private sqlitePorter: SQLitePorter, private sqlite: SQLite, private http: HttpClient) {
     this.plt.ready().then(() => {
-		while(true){console.log("platform ready")}
       this.sqlite.create({
         name: 'supers.db',
         location: 'default'
